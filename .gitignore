@@ -110,4 +110,7 @@ temp/
 # VSCode configurations
 .vscode
 
+# MacOS files
+.DS_STORE
+
 # End of https://www.gitignore.io/api/node

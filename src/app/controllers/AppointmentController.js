@@ -1,9 +1,11 @@
 import * as Yup from 'yup';
-import { startOfHour, parseISO, isBefore } from 'date-fns';
+import { startOfHour, parseISO, isBefore, format } from 'date-fns';
+import pt from 'date-fns/locale/pt';
 
 import Appointment from '../models/Appointment';
 import User from '../models/User';
 import File from '../models/File';
+import Notification from '../schemas/Notification';
 
 class AppointmentController {
   async index(req, res) {
@@ -72,7 +74,7 @@ class AppointmentController {
     /**
      * Check if selected appointment date is available in provider's agenda
      */
-    const isHourScheduled = await Appointment.findOne({
+    const isHourAlreadyScheduled = await Appointment.findOne({
       where: {
         date: hourStart,
         provider_id,
@@ -80,7 +82,7 @@ class AppointmentController {
       },
     });
 
-    if (isHourScheduled) {
+    if (isHourAlreadyScheduled) {
       return res
         .status(400)
         .json({ error: 'Provider already scheduled for selected date.' });
@@ -90,6 +92,20 @@ class AppointmentController {
       date: hourStart,
       user_id: req.userId,
       provider_id,
+    });
+
+    /**
+     * Notify provider there's a new appointment
+     */
+    const user = await User.findByPk(req.userId);
+
+    const formattedDate = format(hourStart, "dd 'de' MMMM', às 'H:mm'h'", {
+      locale: pt,
+    });
+
+    await Notification.create({
+      content: `Novo agendamento de ${user.name} para dia ${formattedDate}`,
+      user: provider_id,
     });
 
     return res.json(appointment);
