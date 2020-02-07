@@ -62,6 +62,15 @@ class AppointmentController {
       return res.status(404).json({ error: 'Provider not found.' });
     }
 
+    /**
+     * Check if provider is trying to schedule an appointment to oneself
+     */
+    if (provider_id === req.userId) {
+      return res
+        .status(400)
+        .json({ error: "Can't schedule service to oneself." });
+    }
+
     const hourStart = startOfHour(parseISO(date));
 
     /**
