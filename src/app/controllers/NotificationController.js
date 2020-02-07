@@ -3,7 +3,7 @@ import Notification from '../schemas/Notification';
 
 class NotificationController {
   async index(req, res) {
-    const isProvider = User.findOne({
+    const isProvider = await User.findOne({
       where: { id: req.userId, provider: true },
     });
 
