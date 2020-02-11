@@ -57,7 +57,6 @@ class AvailableController {
       return {
         time,
         dateTime: format(convertedSearchDate, "yyyy-MM-dd'T'HH:mm:ssxxx"),
-        now: format(new Date(), "yyyy-MM-dd'T'HH:mm:ssxxx"),
         available:
           isAfter(convertedSearchDate, new Date()) &&
           !appointments.find(a => format(a.date, 'HH:mm') === time),
