@@ -10,6 +10,7 @@ import {
 } from 'date-fns';
 
 import Appointment from '../models/Appointment';
+import User from '../models/User';
 
 class AvailableController {
   async index(req, res) {
@@ -19,11 +20,24 @@ class AvailableController {
       return res.status(400).json({ error: 'Specify a correct date.' });
     }
 
+    const { providerId } = req.params;
+
+    const isProvider = await User.findOne({
+      where: {
+        id: providerId,
+        provider: true,
+      },
+    });
+
+    if (!isProvider) {
+      return res.status(400).json({ error: 'Provider not found.' });
+    }
+
     const searchDate = Number(date);
 
     const appointments = await Appointment.findAll({
       where: {
-        provider_id: req.params.providerId,
+        provider_id: providerId,
         cancelled_at: null,
         date: {
           [Op.between]: [startOfDay(searchDate), endOfDay(searchDate)],
